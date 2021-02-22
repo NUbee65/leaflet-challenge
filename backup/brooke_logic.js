@@ -76,7 +76,8 @@ var geojsonMarkerOptions = {
     color: "#000",
     weight: 1,
     opacity: 1,
-    fillOpacity: 0.8}
+    fillOpacity: 0.8
+  }
     
   // Use L.geoJSON to create a geoJSON layer
   var earthquake = L.geoJSON(earthquakeData, {

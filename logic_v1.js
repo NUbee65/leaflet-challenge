@@ -1,5 +1,5 @@
 // Where are we getting the data?
-var queryUrl = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2021-01-06&endtime=2021-01-07&maxlongitude=-69.52148437&minlongitude=-123.83789062&maxlatitude=48.74894534&minlatitude=25.16517337";
+var queryUrl = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2021-01-01&endtime=2021-01-07&maxlongitude=-69.52148437&minlongitude=-123.83789062&maxlatitude=48.74894534&minlatitude=25.16517337";
 
 // Perform a GET request to the query URL
 // Fetch the data from the API endpoint
@@ -11,75 +11,63 @@ d3.json(queryUrl).then(data => {
   var earthquakeData = data['features'];
   console.log(earthquakeData);
 
-  earthquakeLayer = { 
-     
-    function getMagSize(mag) {
-       switch (true) {
-       case mag > 9:
-         return 38000;
-       case mag > 8:
-         return 34000; 
-       case mag > 7:
-         return 30000;
-       case mag > 6:
-         return 26000;
-       case mag > 5:
-         return 22000;
-       case mag > 4:
-         return 18000;
-       case mag > 3:
-         return 14000;
-       case mag > 2:
-         return 10000;
-       case mag > 1:
-         return 6000; 
-       default:
-         return 2000;
-       };
-     };
+  /*
+  var geojsonMarkerOptions = {
+    radius: 1500,
+    fillColor: "darkred",
+    color: "#000",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8};
+  */
 
-    function getDepColor(dep) {
-       switch (true) {
-       case dep > 9:
-         return "#061a00";
-       case dep > 8:
-         return "#134d00"; 
-       case dep > 7:
-         return "#208000";
-       case dep > 6:
-         return "#2db300";
-       case dep > 5:
-         return "#39e600";
-       case dep > 4:
-         return "#53ff1a";
-       case dep > 3:
-         return "#79ff4d";
-       case dep > 2:
-         return "#9fff80";
-       case dep > 1:
-         return "#c6ffb3"; 
-       default:
-         return "#ecffe6";
-       };
-     };
+ 
 
-    function geojsonMarkerOptions(feature) {
-      return {    
-        radius: getMagSize(feature.properties.mag),
-        fillColor: getDepColor(feature.geometry.coordinates[2]),
-        color: "#000",
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.8
+  // Use L.geoJSON to create a geoJSON layer
+  var earthquakeLayer = L.geoJson(earthquakeData, {
+
+    // We turn each feature into a circleMarker on the map.
+    pointToLayer: function (feature, latlng) {
+
+      // marker size function returns based on magnitude
+      function getMagSize(x) {
+        return x > 9 ? 38000 :
+         x > 8 ? 34000 :
+         x > 7 ? 30000 :
+         x > 6 ? 26000 :
+         x > 5 ? 22000 :
+         x > 4 ? 18000 :
+         x > 3 ? 14000 :
+         x > 2 ? 10000 :
+         x > 1 ? 6000 :
+         2000;
       };
-    };
 
-    var pointToLayer = function (feature, latlng) {
-      // We turn each feature into a circleMarker on the map.
-      return L.circleMarker(latlng, geojsonMarkerOptions(feature));     
-    };
+      // marker color function returns based on depth
+      function getDepColor(x) {
+        return y > 45 ? "#061a00" :
+         y > 40 ? "#134d00" :
+         y > 35 ? "#208000" :
+         y > 30 ? "#2db300" :
+         y > 25 ? "#39e600" :
+         y > 20 ? "#53ff1a" :
+         y > 15 ? "#79ff4d" :
+         y > 10 ? "#9fff80" :
+         y > 5 ? "#c6ffb3" :
+         "#ecffe6";
+      };
+      
+      // style function 
+      function style(feature) {
+        return {
+          "radius": getMagSize(feature.properties.mag),
+          "colorFill": getDepColor(feature.geometry.coordinates[2])
+        };
+      };
 
-    let earthquakeLayer = L.geoJSON(earthquakeData, {pointToLayer: pointToLayer});
+      return L.circleMarker(latlng, style);      
+
+    },
 
     // We set the style for each circleMarker using our styleInfo function.
     //style: styleInfo,
@@ -90,10 +78,9 @@ d3.json(queryUrl).then(data => {
         <hr>Date: ${new Date(feature.properties.time)}
         <br>Magnitude: ${feature.properties.mag}
         <br>Depth: ${feature.geometry.coordinates[2]}        
-      `)
-    };    
-
-  };
+      `);
+      }    
+    });
   
     
     // Define streetmap and darkmap layers
