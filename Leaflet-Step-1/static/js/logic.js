@@ -85,8 +85,8 @@ d3.json(queryUrl).then(data => {
         layer.bindPopup(`
         <h3>Location: ${feature.properties.place}</h3>
         <hr>Date: ${new Date(feature.properties.time)}
-        <br>Magnitude: ${feature.properties.mag}
-        <br>Depth: ${feature.geometry.coordinates[2]}        
+        <br>Magnitude: ${feature.properties.mag} (Richter)
+        <br>Depth: ${feature.geometry.coordinates[2]} (km)
         `)
       }
     });
@@ -187,9 +187,9 @@ function createMap(earthquakes) {
   legend.onAdd = function (map) {
     
     var div = L.DomUtil.create('div', 'info legend'),
-    grades = [0,1,2,3,4,5,6,7,8,9],
+    grades = [0,1,2,3,4,5,6],
     labels = ['<strong>Magnitude<br>(Richter)</strong><hr>'],
-    categories = ['0-1','1-2','2-3','3-4','4-5','5-6','6-7','7-8','8-9','9+'];
+    categories = ['0-1','1-2','2-3','3-4','4-5','5-6','6-7'];
     
     // loop through our density intervals and generate a label with a colored square for each interval
     for (var i = 0; i < grades.length; i++) {
